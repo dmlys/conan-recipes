@@ -4,11 +4,14 @@ from conan import ConanFile
 from conan.tools.build import can_run
 
 from conan.tools.build import build_jobs
-from conan.tools.microsoft import VCVars
+from conan.tools.gnu import AutotoolsToolchain, AutotoolsDeps
+from conan.tools.microsoft import VCVars, NMakeDeps
+
 
 class BoostRecipeTest(ConanFile):
 	
 	settings = "os", "compiler", "build_type", "arch"
+	generators = "AutotoolsToolchain", "AutotoolsDeps"
 	
 	def requirements(self):
 		self.requires(self.tested_reference_str)
@@ -32,28 +35,16 @@ class BoostRecipeTest(ConanFile):
 		return flags
 	
 	def build(self):
-		deps_cpp = self.dependencies[self.tested_reference_str].cpp_info.aggregated_components()
 		if self.settings.compiler == "msvc":
-			includes = [f"/I \"{i}\"" for i in deps_cpp.includedirs]
-			libdirs  = [f"/link /LIBPATH:\"{l}\"" for l in deps_cpp.libdirs]
-			depstr = " ".join(includes + libdirs)
-		else:
-			includes = [f"-isystem \"{i}\"" for i in deps_cpp.includedirs]
-			libdirs  = [f"-L\"{l}\"" for l in deps_cpp.libdirs]
-			depstr = " ".join(includes + libdirs)
-		
-		defines  = " ".join([f"-D{d}" for d in deps_cpp.defines])
-		includes = " ".join(includes)
-		libdirs  = " ".join(libdirs)
-		
-		if self.settings.compiler == "msvc":
-			libname = "boost_chrono.lib"
+			libs = ["boost_chrono.lib"]
 			if not self.dependencies[self.tested_reference_str].options.shared:
-				libname = "lib" + libname
+				libs = ["lib" + l for l in libs]
 				
-			self.run(f"cl {self._msvc_flags()} {includes} {defines} {os.path.join(self.source_folder, 'main.cpp')} /Fe:test.exe {libdirs} {libname}", env=["conanbuild"])
+			cmd = f"call cl %CXXFLAGS% %CPPFLAGS% {self._msvc_flags()} {os.path.join(self.source_folder, 'main.cpp')} /Fe:test.exe /link %LDFLAGS% {' '.join(libs)}"
 		else:
-			self.run(f"$CXX $CXXFLAGS {includes} {defines} {libdirs} -lboost_chrono main.cpp -o test", env=["conanbuild"])
+			cmd = f"$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS {os.path.join(self.source_folder, 'main.cpp')} -lboost_chrono -o test"
+		
+		self.run(cmd, env=["conanbuild", "conanrun"])
 	
 	def test(self):
 		if can_run(self):
