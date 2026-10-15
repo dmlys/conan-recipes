@@ -88,7 +88,15 @@ class BoostRecipe(ConanFile):
 					target_cmd,
 					os.path.join(self.build_folder, 'boost-build'))
 
-		cmd += f" variant={str(self.settings.build_type).lower()}"
+		match self.settings.build_type:
+			case "Release":  cmd += " variant=release"
+			case "Debug":	 cmd += " variant=debug"
+			case _:
+				if str(self.settings.build_type).find("Rel") >= 0:
+					cmd += " variant=release"
+				else:
+					cmd += " variant=debug"
+		
 		cmd += f" link={'shared' if self.options.shared == True else 'static'}"
 		if runtime := self.settings.compiler.get_safe('runtime'):
 			cmd += f" runtime-link={'static' if runtime == 'static' else 'shared'}"
@@ -96,7 +104,7 @@ class BoostRecipe(ConanFile):
 		# add explicit address-model for x86 architectures, for others, let boost decide itself for now
 		match self.settings.get_safe('arch'):
 			case "x86_64":  cmd += f" address-model=64"
-			case "x86":	 cmd += f" address-model=32"
+			case "x86":     cmd += f" address-model=32"
 		
 		cxxflags = ""
 		if self.options.get_safe('fPIC') and not self.options.shared:
@@ -136,4 +144,7 @@ class BoostRecipe(ConanFile):
 	def package_info(self):
 		# linking will be done by consumer explicitly
 		self.cpp_info.libs = []
+		self.cpp_info.defines = ["BOOST_ALL_NO_LIB", "BOOST_AUTO_LINK_NOMANGLE"]
+		if self.options.shared:
+			self.cpp_info.defines += ["BOOST_ALL_DYN_LINK"]
 	
