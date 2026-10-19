@@ -27,12 +27,7 @@ class BoostRecipeTest(ConanFile):
 			msvc_env.generate()
 	
 	def _msvc_flags(self):
-		flags = "/EHsc "
-		flags += "/MT" if self.settings.compiler.runtime == "static" else "/MD"
-		if self.settings.compiler.runtime_type == "Debug":
-			flags += "d"
-		
-		return flags
+		return "/EHsc"
 	
 	def build(self):
 		if self.settings.compiler == "msvc":
