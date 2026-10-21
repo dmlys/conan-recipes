@@ -6,10 +6,9 @@ from enum import Enum
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 
-#from conan.tools.files import get, copy
+from conan.tools.files import get, copy
 from conan.tools.build import check_max_cppstd, check_min_cppstd
 from conan.tools.build import build_jobs, can_run
-from conan.tools.scm import Git
 from conan.tools.cmake import cmake_layout, CMakeConfigDeps, CMakeToolchain, CMake
 
 
@@ -43,8 +42,7 @@ class FmtRecipe(ConanFile):
 			self.options.rm_safe("fPIC")
 
 	def source(self):
-		git = Git(self)
-		git.fetch_commit("https://github.com/fmtlib/fmt", self.version)
+		get(self, f"https://github.com/fmtlib/fmt/archive/refs/tags/{self.version}.tar.gz", strip_root=True)
 
 	def validate(self):
 		check_min_cppstd(self, "11")
