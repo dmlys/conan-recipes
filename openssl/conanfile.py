@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os, platform
+import shutil
 
 from enum import Enum
 from conan import ConanFile
@@ -100,8 +101,8 @@ class OpenSSLRecipe(ConanFile):
 			perl_fix_cmd = ""
 			# replace /MT ->  /MD and vice versa for runtime: dynamic, static
 			match self.settings.compiler.get_safe('runtime'):
-				case 'dynamic': perl_fix_cmd += "s/([\/-])MT(d?)/$1MD$2/g; "
-				case 'static':  perl_fix_cmd += "s/([\/-])MD(d?)/$1MT$2/g; "
+				case 'dynamic': perl_fix_cmd += r"s/([\/-])MT(d?)/$1MD$2/g; "
+				case 'static':  perl_fix_cmd += r"s/([\/-])MD(d?)/$1MT$2/g; "
 			
 			if not self.options.shared:
 				# change /Zi -> /Z7, remove /Fd<pdb>, remove ossl_static.pdb mentions
@@ -139,8 +140,8 @@ class OpenSSLRecipe(ConanFile):
 		
 	def package(self):
 		copy(self, "applink.c", src=f"{self.source_folder}/ms", dst=f"{self.package_folder}/include/openssl")
-		copy(self, "*.h", src=f"{self.source_folder}/include/openssl", dst=f"{self.package_folder}/include/openssl")
-		copy(self, "*.h", src=f"{self.build_folder}/include/openssl", dst=f"{self.package_folder}/include/openssl")
+		copy(self, "*.h", src=f"{self.source_folder}/include/openssl", dst=f"{self.package_folder}/include/openssl", ignore_case=False)
+		copy(self, "*.h", src=f"{self.build_folder}/include/openssl", dst=f"{self.package_folder}/include/openssl", ignore_case=False)
 		
 		if self.settings.compiler == "msvc": 
 			copy(self, "openssl-*.lib", src=f"{self.build_folder}", dst=f"{self.package_folder}/lib")
@@ -153,10 +154,11 @@ class OpenSSLRecipe(ConanFile):
 		if self.settings.os == "Windows":
 			copy(self, "openssl.exe", src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
 			copy(self, "openssl.pdb", src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
-			copy(self, "openssl.cnf", src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
 		else:
 			copy(self, "openssl",     src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
-			copy(self, "openssl.cnf", src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
+
+		shutil.copyfile(f"{self.build_folder}/apps/openssl.cnf", f"{self.package_folder}/bin/openssl.cnf", follow_symlinks=True)
+		#copy(self, "openssl.cnf", src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
 			
 
 	def package_info(self):
