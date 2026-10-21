@@ -10,7 +10,6 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import get, copy
 from conan.tools.build import check_max_cppstd, check_min_cppstd
 from conan.tools.build import build_jobs, can_run
-from conan.tools.scm import Git
 from conan.tools.microsoft import VCVars
 
 
@@ -54,8 +53,7 @@ class OpenSSLRecipe(ConanFile):
 		self.tool_requires("perl-text-template/[>=1]")
 
 	def source(self):
-		git = Git(self)
-		git.fetch_commit("https://github.com/openssl/openssl.git", f"openssl-{self.version}")
+		get(self, f"https://github.com/openssl/openssl/archive/refs/tags/openssl-{self.version}.tar.gz", strip_root=True)
 
 	def layout(self):
 		self.folders.source = "src"
@@ -149,7 +147,7 @@ class OpenSSLRecipe(ConanFile):
 			copy(self, "openssl-*.pdb", src=f"{self.build_folder}", dst=f"{self.package_folder}/bin")
 		else:
 			copy(self, "lib*.a", src=f"{self.build_folder}", dst=f"{self.package_folder}/lib")
-			copy(self, "lib*.so", src=f"{self.build_folder}", dst=f"{self.package_folder}/lib")
+			copy(self, "lib*.so*", src=f"{self.build_folder}", dst=f"{self.package_folder}/lib")
 		
 		if self.settings.os == "Windows":
 			copy(self, "openssl.exe", src=f"{self.build_folder}/apps", dst=f"{self.package_folder}/bin")
