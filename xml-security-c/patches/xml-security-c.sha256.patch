@@ -1,0 +1,69 @@
+# patch -p1 < xml-security-c.sha256.patch
+--- xsec/enc/WinCAPI/WinCAPICryptoKeyRSA.cpp	2018-06-18 17:48:29.000000000 +0300
++++ xsec/enc/WinCAPI/WinCAPICryptoKeyRSA.cpp	2022-08-25 19:07:36.752935659 +0300
+@@ -258,11 +258,20 @@
+         alg = CALG_MD5;
+         break;
+     case (XSECCryptoHash::HASH_SHA1):
++        alg = CALG_SHA1;
+-        alg=CALG_SHA1;
+         break;
++	case (XSECCryptoHash::HASH_SHA256):
++		alg = CALG_SHA_256;
++		break;
++	case (XSECCryptoHash::HASH_SHA384):
++		alg = CALG_SHA_384;
++		break;
++	case (XSECCryptoHash::HASH_SHA512):
++		alg = CALG_SHA_512;
++		break;
+     default:
+         throw XSECCryptoException(XSECCryptoException::RSAError,
++            "WinCAPI:RSA Unsupported hash algorithm for RSA sign - only MD5, SHA1, SHA-256, SHA-384, SHA-512 supported");
+-            "WinCAPI:RSA Unsupported hash algorithm for RSA sign - only MD5 or SHA1 supported");
+     }
+ 
+     // Decode the signature
+@@ -373,9 +382,18 @@
+     case (XSECCryptoHash::HASH_SHA1):
+         alg = CALG_SHA1;
+         break;
++	case (XSECCryptoHash::HASH_SHA256):
++		alg = CALG_SHA_256;
++		break;
++	case (XSECCryptoHash::HASH_SHA384):
++		alg = CALG_SHA_384;
++		break;
++	case (XSECCryptoHash::HASH_SHA512):
++		alg = CALG_SHA_512;
++		break;
+     default:
+         throw XSECCryptoException(XSECCryptoException::RSAError,
++            "WinCAPI:RSA Unsupported hash algorithm for RSA sign - only MD5, SHA1, SHA-256, SHA-384, SHA-512 supported");
+-            "WinCAPI:RSA Unsupported hash algorithm for RSA sign - only MD5 or SHA1 supported");
+     }
+ 
+     // Have to create a Windows hash object and feed in the hash
+--- xsec/enc/WinCAPI/WinCAPICryptoProvider.hpp	2018-06-18 17:48:29.000000000 +0300
++++ xsec/enc/WinCAPI/WinCAPICryptoProvider.hpp	2022-08-25 19:08:52.108742253 +0300
+@@ -36,10 +36,6 @@
+ 
+ #if defined (XSEC_HAVE_WINCAPI)
+ 
+-#if defined (_WIN32_WINNT)
+-#    undef _WIN32_WINNT
+-#endif
+-#define _WIN32_WINNT 0x0400
+ #include <wincrypt.h>
+ 
+ 
+--- xsec/enc/WinCAPI/WinCAPICryptoX509.hpp	2018-06-18 17:48:29.000000000 +0300
++++ xsec/enc/WinCAPI/WinCAPICryptoX509.hpp	2022-08-25 19:15:16.494049993 +0300
+@@ -36,7 +36,6 @@
+ 
+ #if defined (XSEC_HAVE_WINCAPI)
+ 
+-#define _WIN32_WINNT 0x0400
+ #include <wincrypt.h>
+ 
+ class WinCAPICryptoProvider;
