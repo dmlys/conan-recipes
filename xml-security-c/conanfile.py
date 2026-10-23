@@ -14,10 +14,10 @@ from conan.tools.gnu import AutotoolsToolchain, AutotoolsDeps
 from conan.tools.microsoft import VCVars
 
 
-class OpenSSLRecipe(ConanFile):
+class XmlSecurityCRecipe(ConanFile):
 	name = "xml-security-c"
 	
-	description = "Apache Santuario xml-security-c libraries"
+	description = "Apache Santuario xml-security-c library"
 	license = "Apache 2.0 license"
 	homepage = "https://santuario.apache.org/"
 	
@@ -26,6 +26,8 @@ class OpenSSLRecipe(ConanFile):
 
 	options = {"shared": [True, False], "fPIC": [True, False]}
 	default_options = {"shared": False, "fPIC": False}
+
+	exports_sources = "patches/*"
 	
 	no_copy_source = True
 	
@@ -104,5 +106,5 @@ class OpenSSLRecipe(ConanFile):
 			copy(self, "*.lib", src=f"{self.build_folder}", dst=f"{self.package_folder}/lib")
 	
 	def package_info(self):
-		pass
-	
+		self.cpp_info.defines = ["XSEC_HAVE_OPENSSL", "XSEC_HAVE_WINCAPI"]
+		
