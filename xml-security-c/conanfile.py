@@ -10,7 +10,7 @@ from conan.tools.files import get, copy, patch
 from conan.tools.build import check_max_cppstd, check_min_cppstd
 from conan.tools.build import build_jobs, can_run
 from conan.tools.layout import basic_layout
-from conan.tools.gnu import AutotoolsToolchain, AutotoolsDeps
+from conan.tools.gnu import AutotoolsToolchain, AutotoolsDeps, Autotools
 from conan.tools.microsoft import VCVars
 
 
@@ -64,7 +64,10 @@ class XmlSecurityCRecipe(ConanFile):
 			msvc_env.generate()
 		
 		atc = AutotoolsToolchain(self)
+		atc.configure_args.append("--without-xalan")
+		atc.configure_args.append("--disable-xkms")
 		atc.generate()
+
 		ad  = AutotoolsDeps(self)
 		ad.generate()
 			

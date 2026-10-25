@@ -10,6 +10,7 @@ from conan.tools.files import get, copy, patch
 from conan.tools.build import check_max_cppstd, check_min_cppstd
 from conan.tools.build import build_jobs, can_run
 from conan.tools.cmake import cmake_layout, CMakeConfigDeps, CMakeToolchain, CMake
+from conan.tools.gnu   import AutotoolsToolchain, AutotoolsDeps, Autotools
 
 
 class XercesCRecipe(ConanFile):
@@ -51,35 +52,56 @@ class XercesCRecipe(ConanFile):
 		check_min_cppstd(self, "11")
 
 	def layout(self):
-		cmake_layout(self, src_folder="src")
+		if self.settings.compiler == "msvc":
+			basic_layout(self, "src_folder")
+		else:
+			cmake_layout(self, src_folder="src")
 
 	def generate(self):
-		cd = CMakeConfigDeps(self)
-		cd.generate()
-		
-		ct = CMakeToolchain(self)
-		ct.cache_variables["network"] = False
 		if self.settings.compiler == "msvc":
+			cd = CMakeConfigDeps(self)
+			cd.generate()
+			
+			ct = CMakeToolchain(self)
+			ct.cache_variables["network"] = False
 			ct.cache_variables["transcoder"] = "windows"
-		else:
-			ct.cache_variables["transcoder"] = "iconv"
-		ct.cache_variables["message-loader"] = "inmemory"
-		ct.cache_variables["xmlch-type"] = "char16_t"
-		ct.cache_variables["mutex-manager"] = "standard"
+			ct.cache_variables["message-loader"] = "inmemory"
+			ct.cache_variables["xmlch-type"] = "char16_t"
+			ct.cache_variables["mutex-manager"] = "standard"
 		
-		ct.generate()
+			ct.generate()
+		else:
+			atc = AutotoolsToolchain(self)
+			atc.configure_args.append("--disable-network")
+			atc.configure_args.append("--enable-mutexmgr-standard")
+			atc.configure_args.append("--enable-transcoder-iconv")
+			atc.configure_args.append("--enable-msgloader-inmemory")
+			atc.configure_args.append("--enable-xmlch-char16_t")
+			atc.generate()
+
+			ad  = AutotoolsDeps(self)
+			ad.generate()
 
 	def build(self):
-		cmake = CMake(self)
-		cmake.configure()
-		cmake.build()
-		
-		if can_run(self):
-			cmake.ctest(cli_args=["--output-on-failure"])
+		if self.settings.compiler == "msvc":
+			cmake = CMake(self)
+			cmake.configure()
+			cmake.build()
+			
+			if can_run(self):
+				cmake.ctest(cli_args=["--output-on-failure"])
+		else:
+			autotools = Autotools(self)
+			autotools.configure()
+			autotools.make()
 		
 	def package(self):
-		cmake = CMake(self)
-		cmake.install()
+		if self.settings.compiler == "msvc":
+			cmake = CMake(self)
+			cmake.install()
+		else:
+			autotools = Autotools(self)
+			autotools.install()
 
 	def package_info(self):
 		pass
