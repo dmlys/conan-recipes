@@ -54,6 +54,7 @@ class XmlSecurityCRecipe(ConanFile):
 	def source(self):
 		get(self, f"https://archive.apache.org/dist/santuario/c-library/xml-security-c-{self.version}.tar.bz2", strip_root=True)
 		patch(self, patch_file="patches/xml-security-c.sha256.patch")
+		patch(self, patch_file="patches/char_t-fixes.patch")
 
 	def layout(self):
 		basic_layout(self, src_folder="src")

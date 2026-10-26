@@ -1,0 +1,282 @@
+diff -U3 --recursive xsec/samples/simpleDecrypt.cpp xsec/samples/simpleDecrypt.cpp
+--- xsec/samples/simpleDecrypt.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/samples/simpleDecrypt.cpp	2026-10-26 03:50:36.842563156 +0300
+@@ -124,9 +124,11 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialization of libraries" << endl;
+-		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		cerr << "Error Message = : " << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
++
+ 		return -1;
+ 	}
+ 
+diff -U3 --recursive xsec/samples/simpleEncrypt.cpp xsec/samples/simpleEncrypt.cpp
+--- xsec/samples/simpleEncrypt.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/samples/simpleEncrypt.cpp	2026-10-26 03:50:36.842589996 +0300
+@@ -126,9 +126,10 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+-		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		cerr << "Error Message = : " << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+diff -U3 --recursive xsec/samples/simpleHMAC.cpp xsec/samples/simpleHMAC.cpp
+--- xsec/samples/simpleHMAC.cpp	2021-10-15 16:48:12.000000000 +0300
++++ xsec/samples/simpleHMAC.cpp	2026-10-26 03:50:36.842612438 +0300
+@@ -104,9 +104,11 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+ 		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		     << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+diff -U3 --recursive xsec/samples/simpleValidate.cpp xsec/samples/simpleValidate.cpp
+--- xsec/samples/simpleValidate.cpp	2021-10-15 16:48:42.000000000 +0300
++++ xsec/samples/simpleValidate.cpp	2026-10-26 03:50:36.842634404 +0300
+@@ -122,9 +122,11 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+ 		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		     << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+diff -U3 --recursive xsec/tools/c14n/c14n.cpp xsec/tools/c14n/c14n.cpp
+--- xsec/tools/c14n/c14n.cpp	2018-06-18 17:48:28.000000000 +0300
++++ xsec/tools/c14n/c14n.cpp	2026-10-26 03:50:36.842656111 +0300
+@@ -112,9 +112,11 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+ 		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		     << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+@@ -140,8 +142,10 @@
+ 
+     catch (const XMLException& e)
+     {
++    	char * msg = XMLString::transcode(e.getMessage());
+         cerr << "An error occurred during parsing\n   Message: "
+-             << e.getMessage() << endl;
++             << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+         errorsOccured = true;
+     }
+ 
+diff -U3 --recursive xsec/tools/checksig/checksig.cpp xsec/tools/checksig/checksig.cpp
+--- xsec/tools/checksig/checksig.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/checksig/checksig.cpp	2026-10-26 03:50:36.842788166 +0300
+@@ -354,8 +354,10 @@
+ 
+     catch (const XMLException& e)
+     {
++    	char * msg = XMLString::transcode(e.getMessage());
+         cerr << "An error occurred during parsing\n   Message: "
+-             << e.getMessage() << endl;
++             << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+         errorsOccured = true;
+     }
+ 
+@@ -600,9 +602,10 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+-		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		cerr << "Error Message = : " << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+diff -U3 --recursive xsec/tools/cipher/cipher.cpp xsec/tools/cipher/cipher.cpp
+--- xsec/tools/cipher/cipher.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/cipher/cipher.cpp	2026-10-26 03:50:36.842876386 +0300
+@@ -590,8 +590,10 @@
+ 
+         catch (const XMLException& e)
+         {
++            char * msg = XMLString::transcode(e.getMessage());
+             cerr << "An error occurred during parsing\n   Message: "
+-                 << e.getMessage() << endl;
++                 << msg << endl;
++            XSEC_RELEASE_XMLCH(msg);
+             errorsOccured = true;
+         }
+ 
+@@ -860,9 +862,10 @@
+     }
+     catch (const XMLException &e) {
+ 
++        char * msg = XMLString::transcode(e.getMessage());
+         cerr << "Error during initialisation of Xerces" << endl;
+-        cerr << "Error Message = : "
+-             << e.getMessage() << endl;
++        cerr << "Error Message = : " << msg << endl;
++        XSEC_RELEASE_XMLCH(msg);
+ 
+     }
+ 
+diff -U3 --recursive xsec/tools/siginf/siginf.cpp xsec/tools/siginf/siginf.cpp
+--- xsec/tools/siginf/siginf.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/siginf/siginf.cpp	2026-10-26 03:50:36.842906370 +0300
+@@ -522,10 +522,10 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+-		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
+-
++		cerr << "Error Message = : " << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 	}
+ 
+ 	retResult = evaluate(argc, argv);
+diff -U3 --recursive xsec/tools/templatesign/templatesign.cpp xsec/tools/templatesign/templatesign.cpp
+--- xsec/tools/templatesign/templatesign.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/templatesign/templatesign.cpp	2026-10-26 03:50:36.842941085 +0300
+@@ -585,9 +585,10 @@
+ 
+     catch (const XMLException &e) {
+ 
++        char * msg = XMLString::transcode(e.getMessage());
+         cerr << "Error during initialisation of Xerces" << endl;
+-        cerr << "Error Message = : "
+-             << e.getMessage() << endl;
++        cerr << "Error Message = : " << msg << endl;
++        XSEC_RELEASE_XMLCH(msg);
+ 
+     }
+ 
+@@ -1066,8 +1067,10 @@
+ 
+     catch (const XMLException& e)
+     {
++        char * msg = XMLString::transcode(e.getMessage());
+         cerr << "An error occurred during parsing\n   Message: "
+-             << e.getMessage() << endl;
++             << msg << endl;
++        XSEC_RELEASE_XMLCH(msg);
+         errorsOccured = true;
+     }
+ 
+diff -U3 --recursive xsec/tools/threadTest/threadtest.cpp xsec/tools/threadTest/threadtest.cpp
+--- xsec/tools/threadTest/threadtest.cpp	2018-06-18 17:48:28.000000000 +0300
++++ xsec/tools/threadTest/threadtest.cpp	2026-10-26 03:50:36.842990945 +0300
+@@ -628,9 +628,11 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+ 		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		     << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+diff -U3 --recursive xsec/tools/txfmout/txfmout.cpp xsec/tools/txfmout/txfmout.cpp
+--- xsec/tools/txfmout/txfmout.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/txfmout/txfmout.cpp	2026-10-26 03:50:36.843023475 +0300
+@@ -417,9 +417,10 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+-		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		cerr << "Error Message = : " << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
+@@ -444,8 +445,10 @@
+ 
+     catch (const XMLException& e)
+     {
++    	char * msg = XMLString::transcode(e.getMessage());
+         cerr << "An error occurred during parsing\n   Message: "
+              << e.getMessage() << endl;
++		XSEC_RELEASE_XMLCH(msg);
+         errorsOccured = true;
+     }
+ 
+diff -U3 --recursive xsec/tools/xklient/xklient.cpp xsec/tools/xklient/xklient.cpp
+--- xsec/tools/xklient/xklient.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/xklient/xklient.cpp	2026-10-26 03:50:36.843058321 +0300
+@@ -3976,8 +3976,10 @@
+         return 2;
+     }
+     catch (const XSECCryptoException &e) {
++        char * msg = XMLString::transcode(e.getMsg());
+         cerr << "An error occurred during encryption/signature processing\n   Message: "
+-        << e.getMsg() << endl;
++        << msg << endl;
++        XSEC_RELEASE_XMLCH(msg);
+ 
+ #if defined (XSEC_HAVE_OPENSSL)
+         ERR_load_crypto_strings();
+@@ -4729,10 +4731,12 @@
+     }
+     catch (const XMLException &e) {
+ 
++        char * msg = XMLString::transcode(e.getMessage());
+         cerr << "Error during initialisation of Xerces" << endl;
+         cerr << "Error Message = : "
+-             << e.getMessage() << endl;
++             << msg << endl;
+ 
++        XSEC_RELEASE_XMLCH(msg);
+     }
+ 
+     retResult = evaluate(argc, argv);
+diff -U3 --recursive xsec/tools/xtest/xtest.cpp xsec/tools/xtest/xtest.cpp
+--- xsec/tools/xtest/xtest.cpp	2021-10-15 17:14:50.000000000 +0300
++++ xsec/tools/xtest/xtest.cpp	2026-10-26 03:50:36.843159365 +0300
+@@ -2719,9 +2719,11 @@
+ 	}
+ 	catch (const XMLException &e) {
+ 
++		char * msg = XMLString::transcode(e.getMessage());
+ 		cerr << "Error during initialisation of Xerces" << endl;
+ 		cerr << "Error Message = : "
+-		     << e.getMessage() << endl;
++		     << msg << endl;
++		XSEC_RELEASE_XMLCH(msg);
+ 
+ 	}
+ 
