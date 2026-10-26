@@ -85,7 +85,7 @@ class Libp11Recipe(ConanFile):
 				ar = "$AR" if ar else "ar"
 
 				clcmd = f"{cc} -c $CXXFLAGS $CPPFLAGS -I {self.source_folder}/src -I {self.build_folder}/src {self.source_folder}/src/*c"
-				arcmd = f"{ar} rvs libp11.a *.o"
+				arcmd = f"{ar} crs libp11.a *.o"
 
 				self.run(clcmd, env="conanbuild")
 				self.run(arcmd, env="conanbuild")
