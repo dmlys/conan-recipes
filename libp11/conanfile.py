@@ -67,9 +67,28 @@ class Libp11Recipe(ConanFile):
 
 	def build(self):
 		if self.settings.compiler != "msvc":
-			autotools = Autotools(self)
-			autotools.configure()
-			autotools.make()
+			if self.options.shared:
+				autotools = Autotools(self)
+				autotools.configure()
+				autotools.make()
+			else:
+				cc = self.buildenv.vars(self).get("CC")
+				ar = self.buildenv.vars(self).get("AR")
+
+				if cc:
+					cc = "$CC"
+				else:
+					compiler_mapping = {"gcc": "gcc", "clang": "clang", "apple-clang": "clang"}
+					compiler_name = str(self.settings.compiler)
+					cc = compiler_mapping.get(compiler_name, "gcc")
+
+				ar = "$AR" if ar else "ar"
+
+				clcmd = f"{cc} -c $CXXFLAGS $CPPFLAGS -I {self.source_folder}/src -I {self.build_folder}/src {self.source_folder}/src/*c"
+				arcmd = f"{ar} rvs libp11.a *.o"
+
+				self.run(clcmd, env="conanbuild")
+				self.run(arcmd, env="conanbuild")
 		else:
 			cxxflags = "/Z7 /Gm-"
 			cxxflags += " /D WIN32 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /D _WIN32_WINNT=0x0A00 /D _CRT_SECURE_NO_DEPRECATE"
@@ -97,7 +116,7 @@ class Libp11Recipe(ConanFile):
 			self.run(ldcmd, cwd=self.build_folder, env="conanbuild")
 		
 	def package(self):
-		if self.settings.compiler != "msvc":
+		if self.settings.compiler != "msvc" and self.options.shared:
 			autotools = Autotools(self)
 			autotools.install()
 		else:
@@ -108,11 +127,14 @@ class Libp11Recipe(ConanFile):
 			shutil.copyfile(src=f"{self.source_folder}/src/p11_ver.h", dst=f"{self.package_folder}/include/p11_ver.h")
 			shutil.copyfile(src=f"{self.source_folder}/src/p11_err.h", dst=f"{self.package_folder}/include/p11_err.h")
 			
-			shutil.copyfile(src=f"{self.build_folder}/libp11.lib", dst=f"{self.package_folder}/lib/libp11.lib")
-			if self.options.get_safe('shared'):
-				os.makedirs(f"{self.package_folder}/bin", exist_ok=True)
-				shutil.copyfile(src=f"{self.build_folder}/libp11.dll", dst=f"{self.package_folder}/bin/libp11.dll")
-				shutil.copyfile(src=f"{self.build_folder}/libp11.pdb", dst=f"{self.package_folder}/bin/libp11.pdb")
+			if self.settings.compiler != "msvc":
+				shutil.copyfile(src=f"{self.build_folder}/libp11.a", dst=f"{self.package_folder}/lib/libp11.a")
+			else:
+				shutil.copyfile(src=f"{self.build_folder}/libp11.lib", dst=f"{self.package_folder}/lib/libp11.lib")
+				if self.options.get_safe('shared'):
+					os.makedirs(f"{self.package_folder}/bin", exist_ok=True)
+					shutil.copyfile(src=f"{self.build_folder}/libp11.dll", dst=f"{self.package_folder}/bin/libp11.dll")
+					shutil.copyfile(src=f"{self.build_folder}/libp11.pdb", dst=f"{self.package_folder}/bin/libp11.pdb")
 	
 	def package_info(self):
 		self.cpp_info.defines = []
